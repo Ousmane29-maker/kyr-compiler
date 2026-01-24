@@ -1,19 +1,27 @@
 package kyr.ast;
 
-import kyr.ast.Sequence;
+import kyr.ast.declarations.Declaration;
 import kyr.symtable.SymbolTable;
 
 public class Program extends ASTNode {
     protected Sequence sequence;
+    protected Declaration declaration;
+
+    public Program(Declaration d, Sequence s) {
+        super(-1);
+        sequence = s;
+        declaration = d;
+    }
 
     public Program(Sequence s) {
         super(-1);
         sequence = s;
     }
 
+
     @Override
     public void analyzeSemantics() {
-        throw new UnsupportedOperationException("semantic analysis is not implemented");
+        //throw new UnsupportedOperationException("semantic analysis is not implemented");
     }
 
     @Override
@@ -29,11 +37,12 @@ public class Program extends ASTNode {
                 .text
                 main:
                 """);
+        sb.append(SymbolTable.getInstance().toMIPS_Allocation_Variables());
         sb.append(sequence.toMIPS());
         sb.append("""
                 end:
                     li $v0, 10          # terminate execution
-                syscall
+                    syscall
                 """);
         return sb.toString();
     }

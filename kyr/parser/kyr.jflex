@@ -32,7 +32,8 @@ import java_cup.runtime.*;
 
 Digit = [0-9]
 Integer = {Digit}+
-Bool = vrai|faux
+Boolean = vrai|faux
+Identifier = [a-zA-Z_][a-zA-Z0-9_#]*
 
 
 LineTerminator = \r|\n|\r\n
@@ -67,12 +68,22 @@ WhiteSpace = {LineTerminator} | [ \t\f]
 
 "//".*                { /* DO NOTHING */ }
 
+/* Keywords */
+"variables"           { return symbol(Symbols.VARIABLES_KW); }
 "debut"               { return symbol(Symbols.BEGIN); }
 "fin"                 { return symbol(Symbols.END); }
 "ecrire"              { return symbol(Symbols.PRINT); }
+"entier"              { return symbol(Symbols.INTEGER_KW); }
+"booleen"             { return symbol(Symbols.BOOLEAN_KW); }
 ";"                   { return symbol(Symbols.SEMICOLON); }
 
+/* Literals and Identifiers */
 {Integer}             { return symbol(Symbols.INTEGER, yytext()); }
-{Bool}                { return symbol(Symbols.BOOL, yytext()); }
+{Boolean}             { return symbol(Symbols.BOOLEAN, yytext()); }
+{Identifier}          { return symbol(Symbols.IDENTIFIER, yytext()); }      // Last position to avoid capturing keywords.
+
+
 {WhiteSpace}          { }
 .                     { throw new LexicalError("line " + yyline + ", column " + yycolumn + ": " + yytext()); }
+
+

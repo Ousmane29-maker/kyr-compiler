@@ -12,7 +12,7 @@ public class Kyr {
             Parser parser = new Parser(new Lexer(new FileReader(kyrFile)));
             ASTNode ast = (ASTNode)parser.parse().value;
 
-            //ast.analyzeSemantics();
+            ast.analyzeSemantics();
             System.out.println("COMPILATION OK");
 
             String asmFile = kyrFile.replaceAll("[.]kyr", ".mips");

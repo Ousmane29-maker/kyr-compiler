@@ -18,7 +18,7 @@ public class Print extends Statement {
 
     @Override
     public String toMIPS() {
-        if (BoolConstant.class.isInstance(exp)){
+        if (BooleanConstant.class.isInstance(exp)){
             String label = LabelFactory.newLabel();
             return exp.toMIPS() + String.format("""
                         la $a0, faux
@@ -31,7 +31,7 @@ public class Print extends Statement {
         }
         return exp.toMIPS() + String.format("""
                     move $a0, $v0
-                    li $v0, %d           # set the syscall code for printing
+                    li $v0, %d            # set the syscall code for printing
                     syscall
                 """, StringConstant.class.isInstance(exp) ? 4 : 1);
     }

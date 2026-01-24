@@ -33,8 +33,8 @@ parser code {:
 
 /* Terminals (tokens returned by the scanner).  */
 
-terminal Symbol BEGIN, END, SEMICOLON, PRINT;
-terminal String INTEGER, STRING, BOOL;
+terminal Symbol BEGIN, END, SEMICOLON, PRINT, VARIABLES_KW, INTEGER_KW, BOOLEAN_KW;
+terminal String INTEGER, STRING, BOOLEAN, IDENTIFIER;
 
 /* Non terminals used in the grammar section.  */
 
@@ -43,14 +43,46 @@ non terminal Sequence SEQ_NE;    // non-empty sequence of statements
 non terminal Sequence SEQUENCE;  // possibly empty sequence of statements
 non terminal Statement STATEMENT;
 non terminal Expression EXP;
+non terminal Type TYPE;
+non terminal VariableDeclaration VAR_DECL;
+non terminal Declaration DECLARATION;
+non terminal Declaration DECLARATION_NE;
+
 
 /* ----------------------------Grammar Section-------------------- */
 
 start with PROG;
 
-PROG      ::=   BEGIN SEQUENCE:li END
+
+
+
+PROG      ::=   VARIABLES_KW DECLARATION:decl BEGIN SEQUENCE:li END
+                {: RESULT = new Program(decl, li); :}
+           |
+                BEGIN SEQUENCE:li END
                 {: RESULT = new Program(li); :}
-                ;
+                 ;
+
+DECLARATION
+    ::= DECLARATION_NE:d {: RESULT = d; :}
+    | /* empty */
+      {: RESULT = new Declaration(-1); :}
+    ;
+
+DECLARATION_NE
+    ::= DECLARATION_NE:d VAR_DECL:v
+       {: SymbolTable.getInstance().add(v) ;
+        d.add(v);
+        RESULT = d;
+        :}
+    | VAR_DECL:v
+       {: Declaration d = new Declaration(vleft + 1);
+          SymbolTable.getInstance().add(v) ;
+          d.add(v);
+          RESULT = d;
+       :}
+    ;
+
 
 SEQUENCE  ::=   SEQ_NE:li {: RESULT = li; :}
         |
@@ -72,11 +104,27 @@ STATEMENT ::=   PRINT EXP:e SEMICOLON
                 PRINT STRING:cc SEMICOLON
                 {: StringConstant c = new StringConstant(cc, ccleft + 1);
                    SymbolTable.getInstance().add(c);
-                   RESULT = new Print(c, ccleft); :}
+                   RESULT = new Print(c, ccleft + 1); :}
                 ;
 
 EXP       ::=   INTEGER:c
                 {: RESULT = new IntegerConstant(c, cleft + 1); :}
         |
-                 BOOL:b
-                {: RESULT = new BoolConstant(b, bleft + 1); :};
+                 BOOLEAN:b
+                {: RESULT = new BooleanConstant(b, bleft + 1); :}
+                ;
+
+
+
+VAR_DECL ::= TYPE:t IDENTIFIER:id
+              {: RESULT = new VariableDeclaration(t, id, idleft + 1); :}
+               ;
+
+
+TYPE    ::=     INTEGER_KW
+                {: RESULT = Type.INTEGER; :}
+        |
+                BOOLEAN_KW
+                {: RESULT = Type.BOOLEAN; :}
+                ;
+

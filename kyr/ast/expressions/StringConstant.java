@@ -23,7 +23,7 @@ public class StringConstant extends Constant {
     }
 
     public String toMIPS_DataSegment() {
-        return String.format("%s: .asciiz \"%s\"\n",
+        return String.format("    %s: .asciiz \"%s\"\n",
             mipsLabel,
             cst.replace("\\", "\\\\")
                .replace("\t", "\\t")
