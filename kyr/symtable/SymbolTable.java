@@ -30,6 +30,12 @@ public class SymbolTable {
         variables.put(v.getName(), v);
     }
 
+    public VariableDeclaration find(String s) throws SemanticError{
+        if (!variables.containsKey(s))
+            throw new SemanticError("Undeclared variable `"+s+"`.") ;
+        return variables.get(s) ;
+    }
+
 
     public String toMIPS_DataSegment() {
         StringBuilder sb = new StringBuilder("");
@@ -49,9 +55,9 @@ public class SymbolTable {
             return "";  // No variables
         }
         return String.format("""
-                    move $fp, $sp            # frame pointer
-                    subi $sp, $sp, %d            # %d * 4 octets
-                """, totalSize, nbVars) ;
+                    move $fp, $sp             # initialize frame pointer
+                    subi $sp, $sp, %d         # allocate %d bytes (%d variables)
+                """, totalSize, totalSize, nbVars) ;
     }
 }
 

@@ -7,4 +7,9 @@ public abstract class Constant extends Expression {
         super(n);
         cst = text;
     }
+
+    @Override
+    public String toString(){
+        return cst ;
+    }
 }

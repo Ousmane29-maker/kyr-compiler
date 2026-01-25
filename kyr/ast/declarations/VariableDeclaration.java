@@ -7,6 +7,7 @@ public class VariableDeclaration extends Declaration {
     private Type type;
     private String name;
     private int offset;
+
     public VariableDeclaration(Type type, String name, int n) {
         super(n);
         this.type = type;
@@ -15,12 +16,17 @@ public class VariableDeclaration extends Declaration {
 
     }
 
+    public Type getType() {
+        return type;
+    }
+
+    public int getOffset() {
+        return offset;
+    }
+
 
     public String getName() {
         return name;
     }
 
-    public String toMIPS_Address() {
-        return null ; // Ex: " li $v0, 56-> sw 0($fp)"
-    }
 }

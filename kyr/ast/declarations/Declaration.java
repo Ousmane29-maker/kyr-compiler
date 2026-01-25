@@ -23,7 +23,7 @@ public class Declaration extends ASTNode {
 
     @Override
     public String toMIPS() {
-       return ""; // ne fait rien en .text
+       return "";
     }
 
 }

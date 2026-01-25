@@ -1,5 +1,7 @@
 package kyr.ast.expressions;
 
+import kyr.ast.Type;
+
 public class IntegerConstant extends Constant {
     public IntegerConstant(String text, int n) {
         super(text, n);
@@ -7,7 +9,7 @@ public class IntegerConstant extends Constant {
 
     @Override
     public void analyzeSemantics() {
-        throw new UnsupportedOperationException("semantic analysis is not implemented");
+
     }
 
     @Override
@@ -15,5 +17,10 @@ public class IntegerConstant extends Constant {
         return String.format("""
                     li $v0, %s
                 """, cst);
+    }
+
+    @Override
+    public Type getType() {
+        return Type.INTEGER;
     }
 }

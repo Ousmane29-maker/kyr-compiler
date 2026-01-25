@@ -1,6 +1,7 @@
 package kyr.ast.expressions;
 
 import kyr.LabelFactory;
+import kyr.ast.Type;
 
 public class StringConstant extends Constant {
     protected String mipsLabel;
@@ -33,5 +34,10 @@ public class StringConstant extends Constant {
                .replace("\f", "\\f")
                .replace("\'", "\\'")
                .replace("\"", "\\\""));
+    }
+
+    @Override
+    public Type getType() {
+        return Type.STRING;
     }
 }

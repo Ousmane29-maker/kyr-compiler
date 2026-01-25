@@ -21,7 +21,12 @@ public class Program extends ASTNode {
 
     @Override
     public void analyzeSemantics() {
-        //throw new UnsupportedOperationException("semantic analysis is not implemented");
+        if (declaration != null) {
+            declaration.analyzeSemantics();
+        }
+        if (sequence != null) {
+            sequence.analyzeSemantics();
+        };
     }
 
     @Override
@@ -41,7 +46,7 @@ public class Program extends ASTNode {
         sb.append(sequence.toMIPS());
         sb.append("""
                 end:
-                    li $v0, 10          # terminate execution
+                    li $v0, 10                # terminate execution
                     syscall
                 """);
         return sb.toString();

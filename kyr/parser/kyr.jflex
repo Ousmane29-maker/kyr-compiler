@@ -76,6 +76,7 @@ WhiteSpace = {LineTerminator} | [ \t\f]
 "entier"              { return symbol(Symbols.INTEGER_KW); }
 "booleen"             { return symbol(Symbols.BOOLEAN_KW); }
 ";"                   { return symbol(Symbols.SEMICOLON); }
+"="                   { return symbol(Symbols.ASSIGN_OP); }
 
 /* Literals and Identifiers */
 {Integer}             { return symbol(Symbols.INTEGER, yytext()); }

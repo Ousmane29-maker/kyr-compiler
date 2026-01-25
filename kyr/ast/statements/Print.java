@@ -13,7 +13,7 @@ public class Print extends Statement {
 
     @Override
     public void analyzeSemantics() {
-        throw new UnsupportedOperationException("semantic analysis is not implemented");
+        exp.analyzeSemantics();
     }
 
     @Override
@@ -25,13 +25,13 @@ public class Print extends Statement {
                         beqz $v0, %s
                         la $a0, vrai
                         %s:
-                        li $v0, 4            # set the syscall code for printing
+                        li $v0, 4                 # set the syscall code for printing
                         syscall
                    """, label, label);
         }
         return exp.toMIPS() + String.format("""
                     move $a0, $v0
-                    li $v0, %d            # set the syscall code for printing
+                    li $v0, %d                 # set the syscall code for printing
                     syscall
                 """, StringConstant.class.isInstance(exp) ? 4 : 1);
     }

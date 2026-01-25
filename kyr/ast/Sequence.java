@@ -16,7 +16,9 @@ public class Sequence extends ASTNode {
 
     @Override
     public void analyzeSemantics() {
-        throw new UnsupportedOperationException("semantic analysis is not implemented");
+        for (Statement s : statements) {
+            s.analyzeSemantics();
+        }
     }
 
     @Override

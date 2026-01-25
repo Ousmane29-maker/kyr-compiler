@@ -7,7 +7,9 @@ import kyr.ast.*;
 import kyr.symtable.*;
 import kyr.ast.expressions.*;
 import kyr.ast.statements.*;
+import kyr.ast.declarations.*;
 import kyr.exceptions.*;
+
 
 action code {: :};
 
@@ -33,7 +35,7 @@ parser code {:
 
 /* Terminals (tokens returned by the scanner).  */
 
-terminal Symbol BEGIN, END, SEMICOLON, PRINT, VARIABLES_KW, INTEGER_KW, BOOLEAN_KW;
+terminal Symbol BEGIN, END, SEMICOLON, PRINT, VARIABLES_KW, INTEGER_KW, BOOLEAN_KW, ASSIGN_OP;
 terminal String INTEGER, STRING, BOOLEAN, IDENTIFIER;
 
 /* Non terminals used in the grammar section.  */
@@ -105,6 +107,9 @@ STATEMENT ::=   PRINT EXP:e SEMICOLON
                 {: StringConstant c = new StringConstant(cc, ccleft + 1);
                    SymbolTable.getInstance().add(c);
                    RESULT = new Print(c, ccleft + 1); :}
+        |
+                IDENTIFIER:id ASSIGN_OP EXP:e SEMICOLON
+                {: RESULT = new Assignment(id.toString(), e, eleft+1); :}
                 ;
 
 EXP       ::=   INTEGER:c
@@ -112,6 +117,10 @@ EXP       ::=   INTEGER:c
         |
                  BOOLEAN:b
                 {: RESULT = new BooleanConstant(b, bleft + 1); :}
+
+        |
+                IDENTIFIER:id
+                {: RESULT = new VariableReference(id, idleft); :}
                 ;
 
 
