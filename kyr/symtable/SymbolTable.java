@@ -26,13 +26,13 @@ public class SymbolTable {
 
     public void add(VariableDeclaration v) throws SemanticError {
         if(variables.containsKey(v.getName()))
-            throw new SemanticError("Variable `"+v.getName()+"` already declared.");
+            throw new SemanticError("Line "+v.getNumberLine()+" : Variable `"+v.getName()+"` already declared.");
         variables.put(v.getName(), v);
     }
 
-    public VariableDeclaration find(String s) throws SemanticError{
+    public VariableDeclaration find(String s, int lineNumber) throws SemanticError{
         if (!variables.containsKey(s))
-            throw new SemanticError("Undeclared variable `"+s+"`.") ;
+            throw new SemanticError("Line "+lineNumber+ " : Undeclared variable `"+s+"`.") ;
         return variables.get(s) ;
     }
 

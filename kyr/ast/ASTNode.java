@@ -4,7 +4,7 @@ public abstract class ASTNode {
     protected int lineNumber;
 
     protected ASTNode(int n) {
-        lineNumber = n;
+        lineNumber = n ;
     }
 
     public int getLineNumber() {

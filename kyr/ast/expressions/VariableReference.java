@@ -2,24 +2,29 @@ package kyr.ast.expressions;
 
 import kyr.ast.Type;
 import kyr.ast.declarations.VariableDeclaration;
+import kyr.exceptions.SemanticError;
 import kyr.symtable.SymbolTable;
 
 public class VariableReference extends Expression{
     private String name;
+    VariableDeclaration var ;
 
     public VariableReference(String name, int n) {
         super(n);
         this.name = name;
+        var = SymbolTable.getInstance().find(name, n); // throw exception if the variable isn't declared
     }
 
     @Override
     public void analyzeSemantics() {
-        SymbolTable.getInstance().find(name); // throw exception if the variable isn't declared
+        if (!var.isInitialized()) {
+            throw new SemanticError("Line "+lineNumber+ " : Variable `" + name + "` used before initialization");
+        }
+
     }
 
     @Override
     public String toMIPS() {
-        VariableDeclaration var = SymbolTable.getInstance().find(name);
         return String.format("""
                     lw $v0, %d($fp)            # load %s
                 """, var.getOffset(), name);
@@ -27,7 +32,7 @@ public class VariableReference extends Expression{
 
     @Override
     public Type getType() {
-        return SymbolTable.getInstance().find(name).getType();
+        return var.getType();
     }
 
     @Override

@@ -1,6 +1,7 @@
 package kyr.ast.statements;
 
 import kyr.LabelFactory;
+import kyr.ast.Type;
 import kyr.ast.expressions.*;
 
 public class Print extends Statement {
@@ -18,7 +19,7 @@ public class Print extends Statement {
 
     @Override
     public String toMIPS() {
-        if (BooleanConstant.class.isInstance(exp)){
+        if (exp.getType().equals(Type.BOOLEAN)){
             String label = LabelFactory.newLabel();
             return exp.toMIPS() + String.format("""
                         la $a0, faux
@@ -33,6 +34,6 @@ public class Print extends Statement {
                     move $a0, $v0
                     li $v0, %d                 # set the syscall code for printing
                     syscall
-                """, StringConstant.class.isInstance(exp) ? 4 : 1);
+                """, exp.getType().equals(Type.STRING) ? 4 : 1);
     }
 }

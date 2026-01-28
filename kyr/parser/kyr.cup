@@ -120,7 +120,7 @@ EXP       ::=   INTEGER:c
 
         |
                 IDENTIFIER:id
-                {: RESULT = new VariableReference(id, idleft); :}
+                {: RESULT = new VariableReference(id, idleft + 1); :}
                 ;
 
 
