@@ -46,7 +46,7 @@ public class SymbolTable {
     }
 
     public int getTotalVariableSize() {
-        return OffsetManager.getInstance().getCurrentOffset();
+        return Math.abs(OffsetManager.getInstance().getCurrentOffset());
     }
     public String toMIPS_Allocation_Variables() {
         int totalSize = getTotalVariableSize();

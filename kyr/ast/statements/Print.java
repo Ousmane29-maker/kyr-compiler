@@ -22,12 +22,12 @@ public class Print extends Statement {
         if (exp.getType().equals(Type.BOOLEAN)){
             String label = LabelFactory.newLabel();
             return exp.toMIPS() + String.format("""
-                        la $a0, faux
-                        beqz $v0, %s
-                        la $a0, vrai
-                        %s:
-                        li $v0, 4                 # set the syscall code for printing
-                        syscall
+                       la $a0, faux
+                       beqz $v0, %s
+                       la $a0, vrai
+                       %s:
+                       li $v0, 4                 # set the syscall code for printing
+                       syscall
                    """, label, label);
         }
         return exp.toMIPS() + String.format("""

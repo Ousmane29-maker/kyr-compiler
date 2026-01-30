@@ -1,0 +1,17 @@
+# macOS system files
+.DS_Store
+
+# VS Code w
+.vscode/
+
+# Build artifacts 
+target/
+out/
+
+# Logs 
+*.log
+*.db
+*.lock
+
+# Other temporary files
+*.tmp

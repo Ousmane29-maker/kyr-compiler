@@ -14,7 +14,7 @@ public class OffsetManager {
 
     public  int allocate() {
         int offset = currentOffset;
-        currentOffset += 4;  // 4 bytes for a bool or int
+        currentOffset -= 4;  // 4 bytes for a bool or int
         return offset;
     }
 
