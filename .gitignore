@@ -7,6 +7,7 @@
 # Build artifacts 
 target/
 out/
+*.mips
 
 # Logs 
 *.log
@@ -15,3 +16,8 @@ out/
 
 # Other temporary files
 *.tmp
+
+# build out
+kyr/parser/Lexer.java
+kyr/parser/Parser.java
+kyr/parser/Symbols.java
