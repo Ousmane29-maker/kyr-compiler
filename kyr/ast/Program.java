@@ -1,0 +1,54 @@
+package kyr.ast;
+
+import kyr.ast.declarations.Declaration;
+import kyr.symtable.SymbolTable;
+
+public class Program extends ASTNode {
+    protected Sequence sequence;
+    protected Declaration declaration;
+
+    public Program(Declaration d, Sequence s) {
+        super(-1);
+        sequence = s;
+        declaration = d;
+    }
+
+    public Program(Sequence s) {
+        super(-1);
+        sequence = s;
+    }
+
+
+    @Override
+    public void analyzeSemantics() {
+        if (declaration != null) {
+            declaration.analyzeSemantics();
+        }
+        if (sequence != null) {
+            sequence.analyzeSemantics();
+        };
+    }
+
+    @Override
+    public String toMIPS() {
+        StringBuilder sb = new StringBuilder("");
+        sb.append("""
+                .data
+                    vrai: .asciiz "vrai"
+                    faux: .asciiz "faux"
+                 """);
+        sb.append(SymbolTable.getInstance().toMIPS_DataSegment());
+        sb.append("""
+                .text
+                main:
+                """);
+        sb.append(SymbolTable.getInstance().toMIPS_Allocation_Variables());
+        sb.append(sequence.toMIPS());
+        sb.append("""
+                end:
+                    li $v0, 10                # terminate execution
+                    syscall
+                """);
+        return sb.toString();
+    }
+}

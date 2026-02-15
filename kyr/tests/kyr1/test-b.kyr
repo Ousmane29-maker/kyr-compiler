@@ -1,0 +1,20 @@
+variables
+entier i
+entier j
+booleen flag
+debut
+i = 1;
+j = 2;
+flag = vrai;
+ecrire "i=";
+ecrire i;
+ecrire "\n";
+ecrire "j=";
+ecrire j;
+ecrire "\n";
+ecrire "flag=";
+ecrire flag;
+fin
+
+//return : i=1\nj=2\nflag=vrai
+

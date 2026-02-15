@@ -1,0 +1,18 @@
+variables
+    booleen f
+    booleen t
+debut
+    f = faux;
+    t = non f;     // t devient vrai
+    ecrire f;      // Affiche faux
+    ecrire "\n";
+
+    ecrire t;      // Affiche vrai
+    ecrire "\n";
+
+    ecrire non t;  // Affiche faux
+    ecrire "\n";
+
+    ecrire non non f; // Affiche faux (double négation)
+    ecrire "\n";
+fin

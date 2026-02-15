@@ -1,0 +1,16 @@
+variables
+    entier x
+    entier y
+debut
+    x = 5;
+    y = -x;       // Test sur une variable
+    ecrire -10;   // Test sur une constante : Affiche -10
+    ecrire "\n";
+
+    ecrire y;     // Affiche -5
+    ecrire "\n";
+
+    ecrire -(-x); // Test double négation : Affiche 5
+    ecrire "\n";
+
+fin

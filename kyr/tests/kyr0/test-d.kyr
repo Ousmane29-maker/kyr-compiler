@@ -1,0 +1,7 @@
+debut
+ecrire faux;
+ecrire vrai;
+ecrire faux;
+ecrire 1;
+ecrire "HelloWorld";
+fin
