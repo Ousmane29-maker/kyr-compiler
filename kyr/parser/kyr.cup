@@ -135,7 +135,21 @@ STATEMENT ::=   PRINT EXP:e SEMICOLON
         |
                 IDENTIFIER:id ASSIGN_OP EXP:e SEMICOLON
                 {: RESULT = new Assignment(id.toString(), e, eleft+1); :}
-                ;
+        |
+                 /* IF without ELSE  */
+                 IF_KW EXP:cond THEN_KW SEQUENCE:then_block ENDIF_KW
+                 {: RESULT = new If(cond, then_block, condleft + 1); :}
+        |
+                  /* IF with ELSE */
+                  IF_KW EXP:cond THEN_KW SEQUENCE:then_block ELSE_KW SEQUENCE:else_block ENDIF_KW
+                  {: RESULT = new If(cond, then_block, else_block, condleft + 1); :}
+
+        |
+                   REPEAT_KW SEQUENCE:body UNTIL_KW EXP:cond SEMICOLON
+                   {: RESULT = new Repeat(body, cond, bodyleft + 1); :}
+                   ;
+
+
 
 EXP       ::=   INTEGER:c
                 {: RESULT = new IntegerConstant(c, cleft + 1); :}

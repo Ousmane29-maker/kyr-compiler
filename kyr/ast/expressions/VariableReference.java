@@ -12,15 +12,11 @@ public class VariableReference extends Expression{
     public VariableReference(String name, int n) {
         super(n);
         this.name = name;
-        var = SymbolTable.getInstance().find(name, n); // throw exception if the variable isn't declared
     }
 
     @Override
     public void analyzeSemantics() {
-        if (!var.isInitialized()) {
-            throw new SemanticError("Line "+lineNumber+ " : Variable `" + name + "` used before initialization");
-        }
-
+        var = SymbolTable.getInstance().find(name, lineNumber); // throw exception if the variable isn't declared
     }
 
     @Override

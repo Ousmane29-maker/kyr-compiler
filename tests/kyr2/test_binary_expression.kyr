@@ -1,0 +1,39 @@
+variables
+    entier x
+    entier y
+    entier resultat
+    booleen test
+debut
+    x = 10;
+    y = 4;
+
+    // --- TEST ARITHMÉTIQUE ---
+    // Résultat attendu : 14 (10 + (4 * 2) / 2)
+    // Cela vérifie que la division et multiplication sont prioritaires
+    ecrire x + y * 2 / 2;
+    ecrire "\n";
+
+    // Résultat attendu : 14 ((10 + 4) * 2 / 2)
+    // Ici les parenthèses changent l'ordre mais le résultat est le même par coïncidence hhh
+    ecrire (x + y) * 2 / 2;
+    ecrire "\n";
+
+    // --- TEST COMPARAISON ---
+    // Résultat attendu : vrai 1 car 10 > 4
+    ecrire x > y;
+    ecrire "\n";
+
+    // Résultat attendu : faux  car 10 est différent de 4
+    ecrire x == y;
+    ecrire "\n";
+
+    // --- TEST LOGIQUE COMPLEXE ---
+    // (10 > 5) et (4 <= 4) -> vrai et vrai -> vrai (1)
+    test = (x > 5) et (y <= 4);
+    ecrire test;
+    ecrire "\n";
+
+    // non (10 == 10) ou (4 > 10) -> non vrai ou faux -> faux ou faux -> faux (0)
+    ecrire non (x == 10) ou (y > x);
+    ecrire "\n";
+fin

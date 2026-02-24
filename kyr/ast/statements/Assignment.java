@@ -2,8 +2,6 @@ package kyr.ast.statements;
 
 import kyr.ast.declarations.VariableDeclaration;
 import kyr.ast.expressions.Expression;
-import kyr.ast.expressions.StringConstant;
-import kyr.ast.expressions.VariableReference;
 import kyr.exceptions.SemanticError;
 import kyr.symtable.SymbolTable;
 
@@ -17,7 +15,6 @@ public class Assignment extends Statement{
         this.exp = e;
         this.variableName = variableName ;
         this.var = SymbolTable.getInstance().find(variableName, n);
-        var.setInitialized(true);
     }
 
     @Override

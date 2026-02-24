@@ -7,7 +7,6 @@ public class VariableDeclaration extends Declaration {
     private Type type;
     private String name;
     private int offset;
-    boolean initialized = false;
 
     public VariableDeclaration(Type type, String name, int n) {
         super(n);
@@ -28,14 +27,6 @@ public class VariableDeclaration extends Declaration {
 
     public String getName() {
         return name;
-    }
-
-    public void setInitialized(boolean initialized) {
-        this.initialized = initialized;
-    }
-
-    public boolean isInitialized() {
-        return initialized;
     }
 
     public int getNumberLine(){

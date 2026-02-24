@@ -1,0 +1,23 @@
+variables
+    entier i
+    entier somme
+debut
+    i = 1;
+    somme = 0;
+
+    ecrire "Debut de la boucle de sommation\n";
+
+    repeter
+        ecrire "Valeur de i : ";
+        ecrire i;
+        ecrire "\n";
+
+        somme = somme + i;
+        i = i + 1;
+    jusqua i > 5;
+
+    ecrire "Boucle terminee !\n";
+    ecrire "Somme totale (1+2+3+4+5) = ";
+    ecrire somme;
+    ecrire "\n";
+fin

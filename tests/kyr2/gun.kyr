@@ -1,0 +1,47 @@
+variables
+    entier x
+    entier y
+    entier width
+    entier height
+
+debut
+    width = 40;
+    height = 10;
+    y = 0;
+
+    ecrire "--- KYR BALLISTIC RENDER (GENERATED) ---\n";
+
+    repeter
+        x = 0;
+        repeter
+            // Draw the Barrel (Long thin rectangle)
+            si (y == 3 ou y == 4) et (x > 5 et x < 35) alors
+                ecrire "=";
+            sinon
+                // Draw the Scope (Small block on top)
+                si (y == 2) et (x > 15 et x < 22) alors
+                    ecrire "H";
+                sinon
+                    // Draw the Grip/Handle (Vertical block)
+                    si (x > 8 et x < 12) et (y > 4 et y < 9) alors
+                        ecrire "H";
+                    sinon
+                        // Draw the Body (Thicker middle section)
+                        si (y > 2 et y < 6) et (x > 6 et x < 18) alors
+                            ecrire "#";
+                        sinon
+                            ecrire " ";
+                        finsi
+                    finsi
+                finsi
+            finsi
+
+            x = x + 1;
+        jusqua x >= width;
+
+        ecrire "\n";
+        y = y + 1;
+    jusqua y >= height;
+
+    ecrire "--- RENDER COMPLETE ---\n";
+fin

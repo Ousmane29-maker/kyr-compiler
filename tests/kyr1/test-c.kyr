@@ -1,0 +1,9 @@
+variables
+entier #a
+entier #fuckb#
+entier c
+debut
+#fuckb# = 5 ;
+ecrire "a\nb\n";
+ecrire #fuckb# ;
+fin

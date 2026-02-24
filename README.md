@@ -16,7 +16,7 @@ Kyr1 extends Kyr0 with:
 - **Print instructions** (strings, integers, booleans, variables)
 
 Kyr2 >>>
-- **Arithmetic operations** (Done)
+- **Arithmetic operations** 
 - **Conditional Branching**
 - **Loops**
 

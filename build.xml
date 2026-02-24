@@ -1,0 +1,60 @@
+<project name="kyr" default="precompile" basedir=".">
+    <description>Builds, tests, and runs the project Kyr.</description>
+    <dirname property="module.kyr.basedir" file="${ant.file.kyr}"/>
+    <property name="excludes" value="**/*.cup,**/*.jflex,**/*.odt,**/*.pdf"/>
+    <property name="src" value="${module.kyr.basedir}/kyr"/>
+    <target name="init-cup" depends="clean">
+        <echo message="test des fichiers de cup"/>
+        <condition property="cup.needed">
+            <or>
+                <not>
+                    <available file="${src}/parser/Parser.java"/>
+                </not>
+                <not>
+                    <available file="${src}/parser/Symbols.java"/>
+                </not>
+                <uptodate targetfile="${src}/parser/kyr.cup" srcfile="${src}/parser/Parser.java"></uptodate>
+            </or>
+        </condition>
+    </target>
+    <target name="cup" depends="init-cup" if="cup.needed">
+        <echo message="lancement de java-cup"/>
+        <java classname="java_cup.Main" fork="yes" failonerror="yes">
+            <arg line="-symbols Symbols -parser Parser ${src}/parser/kyr.cup"/>
+            <classpath>
+                <pathelement path="${java.class.path}:./ext/java-cup-11a.jar" />
+            </classpath>
+        </java>
+        <move file="Parser.java" tofile="${src}/parser/Parser.java"/>
+        <move file="Symbols.java" tofile="${src}/parser/Symbols.java"/>
+    </target>
+    <target name="init-lex" depends="cup">
+        <echo message="test des fichiers de jflex"/>
+        <condition property="lex.needed">
+            <or>
+                <not>
+                    <available file="${src}/parser/Lexer.java"/>
+                </not>
+                <uptodate targetfile="${src}/parser/Lexer.java" srcfile="${src}/parser/Lexer.java"></uptodate>
+                <uptodate targetfile="${src}/parser/kyr.jflex" srcfile="${src}/parser/Lexer.java"></uptodate>
+            </or>
+        </condition>
+    </target>
+    <target name="lex" depends="init-lex" if="lex.needed">
+        <echo message="lancement de JFlex"/>
+        <java classname="jflex.Main" fork="yes" failonerror="yes">
+            <arg line="${src}/parser/kyr.jflex"/>
+            <classpath>
+                <pathelement path="${java.class.path}:./ext/jflex-1.6.1.jar" />
+            </classpath>
+        </java>
+    </target>
+    <target name="precompile" depends="lex" description="Compile project.">
+        <echo message="compilation du code"/>
+    </target>
+    <target name="clean">
+        <delete file="${src}/parser/Lexer.java"/>
+        <delete file="${src}/parser/Parser.java"/>
+        <delete file="${src}/parser/Symbols.java"/>
+    </target>
+</project>

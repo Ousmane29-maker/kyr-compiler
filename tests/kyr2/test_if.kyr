@@ -1,0 +1,34 @@
+variables
+    entier x
+    entier y
+    booleen check
+debut
+    x = 10;
+    y = 20;
+    check = vrai;
+
+    // Test 1 : SI simple (doit s'afficher)
+    si x < y alors
+        ecrire "x est plus petit que y\n";
+    finsi
+
+    // Test 2 : SI-SINON (le bloc sinon doit s'afficher)
+    si x > y alors
+        ecrire "Ceci ne doit pas s'afficher\n";
+    sinon
+        ecrire "x n'est pas plus grand que y (Correct)\n";
+    finsi
+
+    // Test 3 : SI avec condition logique complexe
+    si (x == 10) et check alors
+        ecrire "Condition complexe reussie\n";
+    finsi
+
+    // Test 4 : Imbrication (Nested IF)
+    si x == 10 alors
+        ecrire "Premier niveau ok\n";
+        si y == 20 alors
+            ecrire "Deuxieme niveau (imbrique) ok\n";
+        finsi
+    finsi
+fin

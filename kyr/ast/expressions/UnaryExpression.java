@@ -44,7 +44,7 @@ public class UnaryExpression extends Expression {
         if (operator.equals("non")) {
             sb.append("    xori $v0, $v0, 1         # logical NOT : flip boolean (0<->1)\n");
         } else if (operator.equals("-")) {
-            sb.append("    neg $v0, $v0         # negate: $v0 = -$v0\n");
+            sb.append("    neg $v0, $v0               # negate: $v0 = -$v0\n");
         }
 
         return sb.toString();
