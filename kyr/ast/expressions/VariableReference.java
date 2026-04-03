@@ -5,9 +5,14 @@ import kyr.ast.declarations.VariableDeclaration;
 import kyr.exceptions.SemanticError;
 import kyr.symtable.SymbolTable;
 
-public class VariableReference extends Expression{
+/**
+ * Represents a reference to a variable (using its name) within an expression.
+ * Resolves the variable in the symbol table and handles MIPS code generation
+ * for both global and local memory access.
+ */
+public class VariableReference extends Expression {
     private String name;
-    VariableDeclaration var ;
+    private VariableDeclaration var;
 
     public VariableReference(String name, int n) {
         super(n);
@@ -15,15 +20,22 @@ public class VariableReference extends Expression{
     }
 
     @Override
-    public void analyzeSemantics() {
-        var = SymbolTable.getInstance().find(name, lineNumber); // throw exception if the variable isn't declared
+    public void analyzeSemantics() throws SemanticError {
+        // Search for the variable across scopes (from most local to most global)
+        var = SymbolTable.getInstance().findVariable(name, lineNumber);
     }
 
     @Override
     public String toMIPS() {
-        return String.format("""
-                    lw $v0, %d($fp)            # load %s
-                """, var.getOffset(), name);
+        if (var.isGlobal()) {
+            // GLOBAL: Use $s7 (the saved $fp from the main entry point)
+            return String.format("    lw $v0, %d($s7)    # load %s (global)\n",
+                    var.getOffset(), name);
+        } else {
+            // LOCAL: Use the current frame pointer $fp
+            return String.format("    lw $v0, %d($fp)    # load %s (local)\n",
+                    var.getOffset(), name);
+        }
     }
 
     @Override
@@ -32,7 +44,7 @@ public class VariableReference extends Expression{
     }
 
     @Override
-    public String toString(){
-        return name ;
+    public String toString() {
+        return name;
     }
 }

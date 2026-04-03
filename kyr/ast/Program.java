@@ -1,11 +1,14 @@
 package kyr.ast;
 
 import kyr.ast.declarations.Declaration;
+import kyr.ast.declarations.Functions;
 import kyr.symtable.SymbolTable;
 
 public class Program extends ASTNode {
     protected Sequence sequence;
     protected Declaration declaration;
+
+    protected Functions functions;
 
     public Program(Declaration d, Sequence s) {
         super(-1);
@@ -18,11 +21,21 @@ public class Program extends ASTNode {
         sequence = s;
     }
 
+    public Program(Declaration d, Functions f, Sequence s) {
+        super(-1);
+        declaration = d;
+        functions = f;
+        sequence = s;
+    }
+
 
     @Override
     public void analyzeSemantics() {
         if (declaration != null) {
             declaration.analyzeSemantics();
+        }
+        if (functions != null) {
+            functions.analyzeSemantics();
         }
         if (sequence != null) {
             sequence.analyzeSemantics();
@@ -49,6 +62,11 @@ public class Program extends ASTNode {
                     li $v0, 10                # terminate execution
                     syscall
                 """);
+
+        if (functions != null) {
+            sb.append("\n# --- functions ---\n");
+            sb.append(functions.toMIPS());
+        }
         return sb.toString();
     }
 }

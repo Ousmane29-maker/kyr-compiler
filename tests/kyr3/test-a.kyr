@@ -1,0 +1,32 @@
+variables
+    entier longueur
+    entier largeur
+    entier resultat
+    entier temp
+
+fonctions
+    // Fonction qui calcule la somme (longueur + largeur)
+    entier calculerDemiPerimetre() debut
+        resultat = longueur + largeur;
+        retourne resultat;
+    fin
+
+    // Fonction qui multiplie le demi-périmètre par 2
+    entier calculerPerimetre() debut
+        temp = calculerDemiPerimetre();
+        retourne temp * 2;
+    fin
+
+debut
+    longueur = 10;
+    largeur = 5;
+
+    ecrire "Calcul du perimetre d'un rectangle 10x5...\n";
+    
+    // Appel de la fonction
+    resultat = calculerPerimetre();
+
+    ecrire "Le perimetre est : ";
+    ecrire resultat;
+    ecrire "\n";
+fin

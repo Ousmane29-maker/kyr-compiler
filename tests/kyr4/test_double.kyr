@@ -1,0 +1,18 @@
+fonctions
+    entier double(entier x)
+    debut
+        retourne x * 2;
+    fin
+
+debut
+    ecrire double(1);
+    ecrire "\n";
+    ecrire double(2);
+    ecrire "\n";
+    ecrire double(3);
+    ecrire "\n";
+    ecrire double(4);
+    ecrire "\n";
+    ecrire double(5);
+    ecrire "\n";
+fin

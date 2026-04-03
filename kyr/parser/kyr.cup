@@ -34,7 +34,7 @@ parser code {:
 /* ------------Declaration of Terminals and Non Terminals Section----------- */
 
 /* Terminals (tokens returned by the scanner).  */
-terminal Symbol BEGIN, END, SEMICOLON, PRINT, VARIABLES_KW, INTEGER_KW, BOOLEAN_KW, ASSIGN_OP, COMMA;
+terminal Symbol BEGIN, END, SEMICOLON, PRINT, VARIABLES_KW, INTEGER_KW, BOOLEAN_KW, ASSIGN_OP, COMMA, FUNCTIONS_KW, RETURN_KW;
 
 /* control statement keywords */
 terminal Symbol IF_KW, THEN_KW, ELSE_KW, ENDIF_KW, REPEAT_KW, UNTIL_KW;
@@ -67,6 +67,18 @@ non terminal Type TYPE;
 non terminal VariableDeclaration VAR_DECL;
 non terminal Declaration DECLARATION;
 non terminal Declaration DECLARATION_NE;
+non terminal Declaration VARS_OPT;
+non terminal kyr.ast.declarations.Functions FUNCS_OPT;
+non terminal kyr.ast.declarations.Functions FUNS_NE;
+non terminal kyr.ast.declarations.FunctionDeclaration FUN_DECL;
+non terminal Declaration OPT_DECL;
+non terminal kyr.ast.declarations.Functions OPT_FUNCS;
+non terminal Declaration PARAMS_OPT;
+non terminal Declaration PARAMS_NE;
+non terminal Declaration LOCAL_VARS_OPT;
+non terminal java.util.List<kyr.ast.expressions.Expression> ARG_LIST_OPT;
+non terminal java.util.List<kyr.ast.expressions.Expression> ARG_LIST_NE;
+
 
 /* Priority order  */
 precedence left OR_OP;
@@ -82,13 +94,23 @@ precedence right NOT_OP, UMINUS;  // Unary
 
 start with PROG;
 
+PROG ::= OPT_DECL:decl OPT_FUNCS:funcs BEGIN SEQUENCE:li END
+        {: RESULT = new Program(decl, funcs, li); :}
+      ;
 
-PROG      ::=   VARIABLES_KW DECLARATION:decl BEGIN SEQUENCE:li END
-                {: RESULT = new Program(decl, li); :}
-           |
-                BEGIN SEQUENCE:li END
-                {: RESULT = new Program(li); :}
-                 ;
+OPT_DECL ::=
+      VARIABLES_KW DECLARATION:d
+        {: RESULT = d; :}
+    | /* empty */
+        {: RESULT = null; :}
+    ;
+
+OPT_FUNCS ::=
+      FUNCTIONS_KW FUNS_NE:fs
+        {: RESULT = fs; :}
+    | /* empty */
+        {: RESULT = null; :}
+    ;
 
 DECLARATION
     ::= DECLARATION_NE:d {: RESULT = d; :}
@@ -98,18 +120,77 @@ DECLARATION
 
 DECLARATION_NE
     ::= DECLARATION_NE:d VAR_DECL:v
-       {: SymbolTable.getInstance().add(v) ;
+       {:
         d.add(v);
         RESULT = d;
         :}
     | VAR_DECL:v
        {: Declaration d = new Declaration(vleft + 1);
-          SymbolTable.getInstance().add(v) ;
           d.add(v);
           RESULT = d;
        :}
     ;
 
+
+FUNS_NE ::=
+      FUNS_NE:fs FUN_DECL:f
+        {: fs.add(f); RESULT = fs; :}
+    |
+      FUN_DECL:f
+        {: kyr.ast.declarations.Functions fs =
+               new kyr.ast.declarations.Functions(fleft + 1);
+           fs.add(f);
+           RESULT = fs;
+        :}
+    ;
+
+FUN_DECL ::=
+      TYPE:t IDENTIFIER:id LPAREN PARAMS_OPT:params RPAREN LOCAL_VARS_OPT:locals BEGIN SEQUENCE:body END
+        {: RESULT =
+             new kyr.ast.declarations.FunctionDeclaration(t, id, params, locals, body, idleft + 1);
+        :}
+    ;
+
+PARAMS_OPT ::=
+      PARAMS_NE:p
+        {: RESULT = p; :}
+    | /* empty */
+        {: RESULT = new Declaration(-1); :}
+    ;
+
+PARAMS_NE ::=
+      PARAMS_NE:p  VAR_DECL:v
+        {: p.add(v); RESULT = p; :}
+    | VAR_DECL:v
+        {: Declaration d = new Declaration(vleft + 1);
+           d.add(v);
+           RESULT = d;
+        :}
+    ;
+
+ARG_LIST_OPT ::=
+      ARG_LIST_NE:l
+        {: RESULT = l; :}
+    | /* empty */
+        {: RESULT = new java.util.ArrayList<kyr.ast.expressions.Expression>(); :}
+    ;
+
+ARG_LIST_NE ::=
+      ARG_LIST_NE:l COMMA EXP:e
+        {: l.add(e); RESULT = l; :}
+    | EXP:e
+        {: java.util.List<kyr.ast.expressions.Expression> l = new java.util.ArrayList<>();
+           l.add(e);
+           RESULT = l;
+        :}
+    ;
+
+LOCAL_VARS_OPT ::=
+      VARIABLES_KW DECLARATION:d
+        {: RESULT = d; :}
+    | /* empty */
+        {: RESULT = new Declaration(-1); :}
+    ;
 
 SEQUENCE  ::=   SEQ_NE:li {: RESULT = li; :}
         |
@@ -128,13 +209,18 @@ SEQ_NE    ::=   SEQ_NE:li  STATEMENT:i
 STATEMENT ::=   PRINT EXP:e SEMICOLON
                 {: RESULT = new Print(e, eleft + 1); :}
         |
-                PRINT STRING:cc SEMICOLON
-                {: StringConstant c = new StringConstant(cc, ccleft + 1);
-                   SymbolTable.getInstance().add(c);
-                   RESULT = new Print(c, ccleft + 1); :}
+               PRINT STRING:cc SEMICOLON
+                     {: StringConstant c = new StringConstant(cc, ccleft + 1);
+                     SymbolTable.getInstance().add(c);
+                     RESULT = new Print(c, ccleft + 1); :}
         |
                 IDENTIFIER:id ASSIGN_OP EXP:e SEMICOLON
                 {: RESULT = new Assignment(id.toString(), e, eleft+1); :}
+
+        |        RETURN_KW EXP:e SEMICOLON
+                {: RESULT = new kyr.ast.statements.ReturnStatement(e, eleft + 1); :}
+
+
         |
                  /* IF without ELSE  */
                  IF_KW EXP:cond THEN_KW SEQUENCE:then_block ENDIF_KW
@@ -151,6 +237,7 @@ STATEMENT ::=   PRINT EXP:e SEMICOLON
 
 
 
+
 EXP       ::=   INTEGER:c
                 {: RESULT = new IntegerConstant(c, cleft + 1); :}
         |
@@ -160,6 +247,9 @@ EXP       ::=   INTEGER:c
         |
                 IDENTIFIER:id
                 {: RESULT = new VariableReference(id, idleft + 1); :}
+
+        |       IDENTIFIER:id LPAREN ARG_LIST_OPT:args RPAREN
+                    {: RESULT = new kyr.ast.expressions.FunctionCall(id, args, idleft + 1); :}
 
                 /* Parentheses */
         |
@@ -230,8 +320,7 @@ EXP       ::=   INTEGER:c
                EXP:e1 OR_OP EXP:e2
               {: RESULT = new BinaryExpression(e1, "ou", e2, e1left + 1); :}
 
-              ;
-
+             ;
 
 
 VAR_DECL ::= TYPE:t IDENTIFIER:id
@@ -245,4 +334,5 @@ TYPE    ::=     INTEGER_KW
                 BOOLEAN_KW
                 {: RESULT = Type.BOOLEAN; :}
                 ;
+
 

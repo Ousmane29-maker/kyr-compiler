@@ -1,13 +1,18 @@
-# macOS system files
+# OS & IDEs
 .DS_Store
-
-# VS Code w
 .vscode/
+.idea/
+*.iml
+*.class
 
 # Build artifacts 
 target/
 out/
 *.mips
+
+# Ignore generated Meta-info and Manifests
+META-INF/
+manifest.txt
 
 # Logs 
 *.log

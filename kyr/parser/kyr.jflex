@@ -114,10 +114,15 @@ WhiteSpace = {LineTerminator} | [ \t\f]
 "/"                   { return symbol(Symbols.DIV_OP); }
 "%"                   { return symbol(Symbols.MOD_OP); }
 
+"fonctions"           { return symbol(Symbols.FUNCTIONS_KW); }
+"retourne"            { return symbol(Symbols.RETURN_KW); }
+
 /* Literals and Identifiers */
 {Integer}             { return symbol(Symbols.INTEGER, yytext()); }
 {Boolean}             { return symbol(Symbols.BOOLEAN, yytext()); }
 {Identifier}          { return symbol(Symbols.IDENTIFIER, yytext()); }      // Last position to avoid capturing keywords.
+
+
 
 
 {WhiteSpace}          { }

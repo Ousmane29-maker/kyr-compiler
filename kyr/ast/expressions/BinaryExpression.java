@@ -8,6 +8,9 @@ public class BinaryExpression extends Expression {
     private String operator;
     private Expression right;
 
+    private static int cpt = 0;
+
+
     public BinaryExpression(Expression left, String operator, Expression right, int line) {
         super(line);
         this.left = left;
@@ -51,74 +54,112 @@ public class BinaryExpression extends Expression {
         }
     }
 
+
     @Override
     public String toMIPS() {
+
         StringBuilder sb = new StringBuilder();
 
-        // 1. Evaluate the RIGHT operand into $v0
         sb.append(right.toMIPS());
 
-        // 2. Push the result of RIGHT onto the stack
-        sb.append(String.format("    sw $v0, 0($sp)             # push right operand (%s)\n", right.toString()));
-        sb.append("    subi $sp, $sp, 4\n");
+        sb.append("""
+        subi $sp, $sp, 4
+        sw $v0, 0($sp)
+    """);
 
-        // 3. Evaluate the LEFT operand into $v0
         sb.append(left.toMIPS());
 
-        // 4. Pop the RIGHT operand from the stack into $v1
-        sb.append("    addi $sp, $sp, 4           # pop right operand into $v1\n");
-        sb.append(String.format("    lw $v1, 0($sp)             # pop right operand (%s) into $v1\n", right.toString()));
+        sb.append("""
+        lw $v1, 0($sp)
+        addi $sp, $sp, 4
+    """);
 
-        // 5. Do the operation: $v0 = (LEFT) op (RIGHT)
-        // Now: $v0 contains LEFT, $v1 contains RIGHT
-        String fullExpr = '('+this.toString()+')'; // "left op right"
 
         switch (operator) {
-            // --- Arithmetic Operators ---
+
             case "+":
-                sb.append(String.format("    add $v0, $v0, $v1          # %s\n", fullExpr));
+                sb.append("add $v0, $v0, $v1\n");
                 break;
+
             case "-":
-                sb.append(String.format("    sub $v0, $v0, $v1          # %s\n", fullExpr));
+                sb.append("sub $v0, $v0, $v1\n");
                 break;
+
             case "*":
-                sb.append(String.format("    mul $v0, $v0, $v1          # %s\n", fullExpr));
-                break;
-            case "/":
-                sb.append(String.format("    div $v0, $v1               # division: %s\n", fullExpr));
-                sb.append("    mflo $v0                   # get quotient\n");
-                break;
-            case "%":
-                sb.append(String.format("    div $v0, $v1               # modulo: %s\n", fullExpr));
-                sb.append("    mfhi $v0                   # get remainder\n");
+                sb.append("mul $v0, $v0, $v1\n");
                 break;
 
-            // --- Relational Operators ---
+            case "/": {
+                int id = cpt++;
+                sb.append(String.format("""
+                        beq $v1, $zero, div_by_zero_%d
+                        div $v0, $v1
+                        mflo $v0
+                        j div_end_%d
+                div_by_zero_%d:
+                        li $v0, 0
+                div_end_%d:
+                    """, id, id, id, id));
+                                break;
+            }
+
+            case "%": {
+                int id = cpt++;
+                                sb.append(String.format("""
+                        beq $v1, $zero, mod_by_zero_%d
+                        div $v0, $v1
+                        mfhi $v0
+                        j mod_end_%d
+                mod_by_zero_%d:
+                        li $v0, 0
+                mod_end_%d:
+                    """, id, id, id, id));
+                                break;
+            }
+
+
             case "<":
-                sb.append(String.format("    slt $v0, $v0, $v1          # check if %s\n", fullExpr));
-                break;
-            case "<=":
-                sb.append(String.format("    sle $v0, $v0, $v1          # check if %s\n", fullExpr));
-                break;
-            case ">":
-                sb.append(String.format("    sgt $v0, $v0, $v1          # check if %s\n", fullExpr));
-                break;
-            case ">=":
-                sb.append(String.format("    sge $v0, $v0, $v1          # check if %s\n", fullExpr));
-                break;
-            case "==":
-                sb.append(String.format("    seq $v0, $v0, $v1          # check if %s\n", fullExpr));
-                break;
-            case "!=":
-                sb.append(String.format("    sne $v0, $v0, $v1          # check if %s\n", fullExpr));
+                sb.append("slt $v0, $v0, $v1\n");
                 break;
 
-            // --- Logical Operators ---
-            case "et":
-                sb.append(String.format("    and $v0, $v0, $v1          # logical: %s\n", fullExpr));
+            case ">":
+                sb.append("sgt $v0, $v0, $v1\n");
                 break;
-            case "ou":
-                sb.append(String.format("    or $v0, $v0, $v1           # logical: %s\n", fullExpr));
+
+            case "<=":
+                sb.append("""
+                sgt $v0, $v0, $v1
+                xori $v0, $v0, 1
+            """);
+                break;
+
+            case ">=":
+                sb.append("""
+                slt $v0, $v0, $v1
+                xori $v0, $v0, 1
+            """);
+                break;
+
+            case "==":
+                sb.append("""
+                xor $v0, $v0, $v1
+                sltiu $v0, $v0, 1
+            """);
+                break;
+
+            case "!=":
+                sb.append("""
+                xor $v0, $v0, $v1
+                sne $v0, $v0, $zero
+            """);
+                break;
+
+            case "et":   // AND
+                sb.append("and $v0, $v0, $v1\n");
+                break;
+
+            case "ou":   // OR
+                sb.append("or $v0, $v0, $v1\n");
                 break;
         }
 

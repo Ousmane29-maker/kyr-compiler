@@ -1,13 +1,13 @@
 package kyr.ast.declarations;
 
 import kyr.ast.ASTNode;
-import kyr.ast.declarations.VariableDeclaration;
+import kyr.exceptions.SemanticError;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Declaration extends ASTNode {
-    List<VariableDeclaration> vars = new ArrayList<>();
+    private List<VariableDeclaration> vars = new ArrayList<>();
 
     public Declaration(int n) {
         super(n);
@@ -16,14 +16,28 @@ public class Declaration extends ASTNode {
     public void add(VariableDeclaration v){
         vars.add(v);
     }
-    @Override
-    public void analyzeSemantics() {
 
+    public int size() {
+        return vars.size();
+    }
+
+    public List<VariableDeclaration> getVars() {
+        return vars;
+    }
+
+    @Override
+    public void analyzeSemantics() throws SemanticError {
+        for (VariableDeclaration v : vars) {
+            v.analyzeSemantics();
+        }
     }
 
     @Override
     public String toMIPS() {
-       return "";
+        StringBuilder sb = new StringBuilder();
+        for (VariableDeclaration v : vars) {
+            sb.append(v.toMIPS());
+        }
+        return sb.toString();
     }
-
 }

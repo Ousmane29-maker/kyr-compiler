@@ -1,0 +1,389 @@
+variables
+    // constants
+
+    entier shift // fixed-point shift
+    entier rand  // seed for the random number generator
+
+    entier width // image dimensions
+    entier height
+    entier rays
+
+    entier box1min_x entier box1min_y entier box1min_z // scene
+    entier box1max_x entier box1max_y entier box1max_z
+    entier box1col_r entier box1col_g entier box1col_b
+
+    entier box2min_x entier box2min_y entier box2min_z // scene
+    entier box2max_x entier box2max_y entier box2max_z
+    entier box2col_r entier box2col_g entier box2col_b
+
+
+    entier sph1c_x entier sph1c_y entier sph1c_z entier sph1_r
+    entier sph1col_r entier sph1col_g entier sph1col_b
+
+    entier sph2c_x entier sph2c_y entier sph2c_z entier sph2_r
+    entier sph2col_r entier sph2col_g entier sph2col_b
+
+    entier sph3c_x entier sph3c_y entier sph3c_z entier sph3_r
+    entier sph3col_r entier sph3col_g entier sph3col_b
+
+    // variables
+
+    entier i // basic loop indices
+    entier j
+    entier k
+
+    entier rayorg_x entier rayorg_y entier rayorg_z // current ray to trace
+    entier raydir_x entier raydir_y entier raydir_z
+
+    entier point_x  entier point_y  entier point_z  // intersection point
+    entier normal_x entier normal_y entier normal_z // normal at the point
+
+    entier color_r
+    entier color_g
+    entier color_b
+
+    entier color_acc_r
+    entier color_acc_g
+    entier color_acc_b
+
+    entier tmp1 entier tmp2 entier tmp3 entier tmp4
+
+fonctions
+    entier sqrt(entier n)
+    variables
+        entier x
+        entier x_old
+        entier n_one
+    debut
+        si n > 2147483647/shift alors
+            retourne 2*sqrt(n/4);
+        finsi
+        x = shift; // initial guess = 1.0
+        n_one = n * shift; // need to compensate for fixp division
+        repeter
+            x_old = x;
+            x = (x + n_one / x) / 2;
+            si abs(x - x_old)<=1 alors
+                retourne x;
+            finsi
+        jusqua faux;
+    fin
+
+    entier abs(entier x)
+    debut
+        si x<0 alors
+            retourne -x;
+        finsi
+        retourne x;
+    fin
+
+    // LCM pseudo-random number generator.
+    // Outputs numbers from 0..65535 inclusive.
+
+    entier rand()
+    variables
+        entier ret
+    debut
+        rand = (rand*25173 + 13849) % 65536;
+        retourne rand;
+    fin
+
+    entier rnd_nrm()
+    debut
+        retourne (rand()*2*shift)/65536 - shift;
+    fin
+
+    booleen point_inside_rectangle(entier x entier y entier xmin entier ymin entier xmax entier ymax)
+    debut
+        retourne (x >= xmin) et (x <= xmax) et (y >= ymin) et (y <= ymax);
+    fin
+
+    booleen ray_box_intersect(entier boxmin_x entier boxmin_y entier boxmin_z entier boxmax_x entier boxmax_y entier boxmax_z)
+    variables
+        entier d
+        entier side
+    debut
+        normal_x = 0; normal_y = 0; normal_z = 0;
+        si raydir_x!=0 alors
+            si raydir_x>0 alors
+                side = boxmin_x;
+                normal_x = -shift;
+            sinon
+                side = boxmax_x;
+                normal_x =  shift;
+            finsi
+            d = ((side-rayorg_x)*shift)/raydir_x;
+          si d>-shift/512 alors
+                point_x = rayorg_x + (raydir_x*d)/shift;
+                point_y = rayorg_y + (raydir_y*d)/shift;
+                point_z = rayorg_z + (raydir_z*d)/shift;
+                si point_inside_rectangle(point_y, point_z, boxmin_y, boxmin_z, boxmax_y, boxmax_z) alors
+                    retourne vrai;
+                finsi
+          finsi
+        finsi
+        normal_x = 0; normal_y = 0; normal_z = 0;
+        si raydir_y!=0 alors
+            si raydir_y>0 alors
+                side = boxmin_y;
+                normal_y = -shift;
+            sinon
+                side = boxmax_y;
+                normal_y =  shift;
+            finsi
+            d = ((side-rayorg_y)*shift)/raydir_y;
+          si d>-shift/512 alors
+                 point_x = rayorg_x + (raydir_x*d)/shift;
+                 point_y = rayorg_y + (raydir_y*d)/shift;
+                 point_z = rayorg_z + (raydir_z*d)/shift;
+                 si point_inside_rectangle(point_x, point_z, boxmin_x, boxmin_z, boxmax_x, boxmax_z) alors
+                     retourne vrai;
+                 finsi
+          finsi
+        finsi
+        normal_x = 0; normal_y = 0; normal_z = 0;
+        si raydir_z!=0 alors
+            si raydir_z>0 alors
+                side = boxmin_z;
+                normal_z = -shift;
+            sinon
+                side = boxmax_z;
+                normal_z =  shift;
+            finsi
+            d = ((side-rayorg_z)*shift)/raydir_z;
+          si d>-shift/512 alors
+                 point_x = rayorg_x + (raydir_x*d)/shift;
+                 point_y = rayorg_y + (raydir_y*d)/shift;
+                 point_z = rayorg_z + (raydir_z*d)/shift;
+                 si point_inside_rectangle(point_x, point_y, boxmin_x, boxmin_y, boxmax_x, boxmax_y) alors
+                     retourne vrai;
+                 finsi
+            finsi
+      finsi
+        retourne faux;
+     fin
+
+     booleen ray_sphere_intersect(entier sphc_x entier sphc_y entier sphc_z entier sph_r)
+     variables
+         entier displacement_x entier displacement_y entier displacement_z
+         entier proj
+         entier discriminant
+         entier factor
+     debut
+
+         displacement_x = sphc_x - rayorg_x;
+         displacement_y = sphc_y - rayorg_y;
+         displacement_z = sphc_z - rayorg_z;
+         proj = (displacement_x) * raydir_x/shift + (displacement_y) * raydir_y/shift + (displacement_z) * raydir_z/shift;
+         discriminant =  (sph_r*sph_r)/shift + (proj*proj)/shift - (displacement_x*displacement_x)/shift - (displacement_y*displacement_y)/shift - (displacement_z*displacement_z)/shift;
+         si discriminant<0 alors retourne faux; finsi
+         factor = proj - sqrt(discriminant);
+         si factor<0 alors retourne faux; finsi
+         point_x = rayorg_x + (raydir_x * factor)/shift;
+         point_y = rayorg_y + (raydir_y * factor)/shift;
+         point_z = rayorg_z + (raydir_z * factor)/shift;
+         normal_x = ((sphc_x - point_x)*shift)/sph_r;
+         normal_y = ((sphc_y - point_y)*shift)/sph_r;
+         normal_z = ((sphc_z - point_z)*shift)/sph_r;
+         retourne vrai;
+     fin
+
+    entier trace(entier depth)
+    variables
+        entier tmp_dist
+        entier best_dist
+        entier best_point_x  entier best_point_y  entier best_point_z
+        entier best_normal_x entier best_normal_y entier best_normal_z
+        entier best_color_r  entier best_color_g  entier best_color_b
+    debut
+        si depth>4 alors
+            color_r = (color_r *102)/255;
+            color_g = (color_g *102)/255;
+            color_b = (color_b *102)/255;
+            retourne depth;
+        finsi
+
+        best_dist = -shift;
+        si ray_box_intersect(box1min_x, box1min_y, box1min_z, box1max_x, box1max_y, box1max_z) alors
+            best_color_r = box1col_r;
+            best_color_g = box1col_g;
+            best_color_b = box1col_b;
+            best_normal_x = normal_x;
+            best_normal_y = normal_y;
+            best_normal_z = normal_z;
+            best_point_x = point_x;
+            best_point_y = point_y;
+            best_point_z = point_z;
+            best_dist = (point_x-rayorg_x)/shift*(point_x-rayorg_x) + (point_y-rayorg_y)/shift*(point_y-rayorg_y) + (point_z-rayorg_z)/shift*(point_z-rayorg_z);
+        finsi
+
+        si ray_box_intersect(box2min_x, box2min_y, box2min_z, box2max_x, box2max_y, box2max_z) alors
+            tmp_dist = (point_x-rayorg_x)/shift*(point_x-rayorg_x) + (point_y-rayorg_y)/shift*(point_y-rayorg_y) + (point_z-rayorg_z)/shift*(point_z-rayorg_z);
+            si tmp_dist<best_dist ou best_dist<0 alors
+                best_dist = tmp_dist;
+                best_color_r = box2col_r;
+                best_color_g = box2col_g;
+                best_color_b = box2col_b;
+                best_normal_x = normal_x;
+                best_normal_y = normal_y;
+                best_normal_z = normal_z;
+                best_point_x = point_x;
+                best_point_y = point_y;
+                best_point_z = point_z;
+            finsi
+        finsi
+
+        si ray_sphere_intersect(sph1c_x, sph1c_y, sph1c_z, sph1_r) alors
+            tmp_dist = (point_x-rayorg_x)/shift*(point_x-rayorg_x) + (point_y-rayorg_y)/shift*(point_y-rayorg_y) + (point_z-rayorg_z)/shift*(point_z-rayorg_z);
+            si tmp_dist<best_dist ou best_dist<0 alors
+                best_dist = tmp_dist;
+                best_color_r = sph1col_r;
+                best_color_g = sph1col_g;
+                best_color_b = sph1col_b;
+                best_normal_x = normal_x;
+                best_normal_y = normal_y;
+                best_normal_z = normal_z;
+                best_point_x = point_x;
+                best_point_y = point_y;
+                best_point_z = point_z;
+            finsi
+        finsi
+
+        si ray_sphere_intersect(sph2c_x, sph2c_y, sph2c_z, sph2_r) alors
+            tmp_dist = (point_x-rayorg_x)/shift*(point_x-rayorg_x) + (point_y-rayorg_y)/shift*(point_y-rayorg_y) + (point_z-rayorg_z)/shift*(point_z-rayorg_z);
+            si tmp_dist<best_dist ou best_dist<0 alors
+                best_dist = tmp_dist;
+                best_color_r = sph2col_r;
+                best_color_g = sph2col_g;
+                best_color_b = sph2col_b;
+                best_normal_x = normal_x;
+                best_normal_y = normal_y;
+                best_normal_z = normal_z;
+                best_point_x = point_x;
+                best_point_y = point_y;
+                best_point_z = point_z;
+            finsi
+        finsi
+
+        si ray_sphere_intersect(sph3c_x, sph3c_y, sph3c_z, sph3_r) alors
+            tmp_dist = (point_x-rayorg_x)/shift*(point_x-rayorg_x) + (point_y-rayorg_y)/shift*(point_y-rayorg_y) + (point_z-rayorg_z)/shift*(point_z-rayorg_z);
+            si tmp_dist<best_dist ou best_dist<0 alors
+                retourne depth; // lamp, retourn white color
+                best_dist = tmp_dist;
+                best_color_r = sph3col_r;
+                best_color_g = sph3col_g;
+                best_color_b = sph3col_b;
+                best_normal_x = normal_x;
+                best_normal_y = normal_y;
+                best_normal_z = normal_z;
+                best_point_x = point_x;
+                best_point_y = point_y;
+                best_point_z = point_z;
+            finsi
+        finsi
+
+        si best_dist>=-shift/512 alors
+            rayorg_x = best_point_x;
+            rayorg_y = best_point_y;
+            rayorg_z = best_point_z;
+
+            // reflect
+            tmp1 = 2*(raydir_x*best_normal_x/shift + raydir_y*best_normal_y/shift + raydir_z*best_normal_z/shift);
+            raydir_x = raydir_x - (best_normal_x*tmp1)/shift + rnd_nrm()/6;
+            raydir_y = raydir_y - (best_normal_y*tmp1)/shift + rnd_nrm()/6;
+            raydir_z = raydir_z - (best_normal_z*tmp1)/shift + rnd_nrm()/6;
+
+            color_r = (color_r * best_color_r)/255;
+            color_g = (color_g * best_color_g)/255;
+            color_b = (color_b * best_color_b)/255;
+
+            retourne trace(depth+1);
+        sinon
+            color_r = (color_r *102)/255;
+            color_g = (color_g *102)/255;
+            color_b = (color_b *102)/255;
+            retourne depth;
+        finsi
+    fin
+
+debut
+    shift = 2048;
+    rand = 1337;
+    width = 320;
+    height = 240;
+    rays = 1;
+
+    box1min_x = 3*shift; box1min_y = -4*shift; box1min_z = 11*shift;
+    box1max_x = 7*shift; box1max_y =  2*shift; box1max_z = 13*shift;
+    box1col_r = 102; box1col_g = 179; box1col_b = 255;
+
+    box2min_x = 0*shift;  box2min_y =  2*shift;     box2min_z =  6*shift;
+    box2max_x = 11*shift; box2max_y = 23*shift/10; box2max_z = 16*shift;
+    box2col_r = 179; box2col_g = 179; box2col_b = 102;
+
+    sph1c_x = 6*shift; sph1c_y = 0*shift; sph1c_z = 7*shift; sph1_r = 2*shift;
+    sph1col_r = 255; sph1col_g = 102; sph1col_b = 153;
+
+    sph2c_x = 28*shift/10; sph2c_y = 11*shift/10; sph2c_z = 7*shift; sph2_r = 9*shift/10;
+    sph2col_r = 255; sph2col_g = 255; sph2col_b = 77;
+
+    sph3c_x = 5*shift; sph3c_y = -10*shift; sph3c_z = -7*shift; sph3_r = 8*shift;
+    sph3col_r = 255; sph3col_g = 255; sph3col_b = 255;
+
+    ecrire "P3\n"; ecrire width; ecrire " "; ecrire height; ecrire "\n255\n";
+
+    i = 0;
+    repeter
+        j = 0;
+        repeter
+            color_acc_r = 0;
+            color_acc_g = 0;
+            color_acc_b = 0;
+
+            k = 0;
+            repeter
+                color_r = 255;
+                color_g = 255;
+                color_b = 255;
+
+                rayorg_x = 0;
+                rayorg_y = 0;
+                rayorg_z = 0;
+                raydir_x = (j -  width/2)*shift;
+                raydir_y = (i - height/2)*shift;
+                raydir_z = 250*shift; // focal distance
+
+                tmp1 = raydir_x; // 30 degrees rotation around y axis
+                tmp3 = raydir_z;
+                raydir_x =   (tmp1*866)/1000 + (tmp3*5)/10;
+                raydir_z =  -(tmp1*5)/10 + (tmp3*866)/1000;
+
+                raydir_x = raydir_x/(raydir_z/shift);
+                raydir_y = raydir_y/(raydir_z/shift);
+                raydir_z = raydir_z/(raydir_z/shift);
+
+                tmp1 = sqrt((raydir_x*raydir_x)/shift + (raydir_y*raydir_y)/shift + (raydir_z*raydir_z)/shift);
+                raydir_x = (raydir_x*shift)/tmp1;
+                raydir_y = (raydir_y*shift)/tmp1;
+                raydir_z = (raydir_z*shift)/tmp1;
+
+
+                tmp1 = trace(0);
+
+                color_acc_r = color_acc_r + color_r;
+                color_acc_g = color_acc_g + color_g;
+                color_acc_b = color_acc_b + color_b;
+                k = k + 1;
+            jusqua k>=rays;
+
+            color_r = color_acc_r/rays;
+            color_g = color_acc_g/rays;
+            color_b = color_acc_b/rays;
+
+            ecrire color_r; ecrire " " ; ecrire color_g; ecrire " "; ecrire color_b; ecrire "\n";
+            j = j + 1;
+        jusqua j>=width;
+       i = i+1;
+    jusqua i>=height;
+fin
+

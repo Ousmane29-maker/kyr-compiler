@@ -1,0 +1,11 @@
+=== Tests Kyr4 ===
+x = 5, y = 3
+addition(5, 3) = 8
+multiplication(4, 7) = 28
+factorielle(5) = 120
+estPair(4) = vrai
+estPair(7) = vrai
+max(10, 20) = 20
+addition(multiplication(2, 3), max(5, 8)) = 14
+Apres boucle: x = 3
+=== Fin des tests ===

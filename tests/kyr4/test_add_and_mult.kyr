@@ -1,0 +1,30 @@
+variables
+    entier x
+    entier y
+    entier resultat
+
+fonctions
+    entier addition(entier a entier b)
+    debut
+        retourne a + b;
+    fin
+
+    entier multiplication(entier a entier b)
+    variables
+        entier temp
+    debut
+        temp = a * b;
+        retourne temp;
+    fin
+
+debut
+    x = 5;
+    y = 3;
+    resultat = addition(x, y);
+    ecrire resultat;
+
+    ecrire "\n";
+
+    resultat = multiplication(4, 7);
+    ecrire resultat;
+fin

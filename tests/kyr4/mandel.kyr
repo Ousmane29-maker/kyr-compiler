@@ -1,0 +1,65 @@
+variables
+    entier width
+    entier height
+    entier shift
+    entier x
+    entier y
+    entier cr
+    entier ci
+    entier val
+
+fonctions
+    entier mandel(entier zr entier zi entier cr_in entier ci_in entier iter)
+    variables
+        entier zr2
+        entier zi2
+        entier dist2
+    debut
+        // On augmente un peu l'itération pour plus de détails sur une grande image
+        si iter > 30 alors
+            retourne iter;
+        finsi
+
+        zr2 = (zr * zr) / 2048;
+        zi2 = (zi * zi) / 2048;
+        dist2 = zr2 + zi2;
+
+        si dist2 > 8192 alors
+            retourne iter;
+        finsi
+
+        retourne mandel(zr2 - zi2 + cr_in, (2 * zr * zi) / 2048 + ci_in, cr_in, ci_in, iter + 1);
+    fin
+
+debut
+    width = 320;
+    height = 240;
+    shift = 2048;
+
+    ecrire "P3\n";
+    ecrire width; ecrire " "; ecrire height; ecrire "\n255\n";
+
+    y = 0;
+    repeter
+        x = 0;
+        repeter
+            cr = (x * 3 * shift) / width - (2 * shift);
+            ci = (y * 2 * shift) / height - shift;
+
+            val = mandel(0, 0, cr, ci, 0);
+
+            si val > 25 alors
+                ecrire "0 0 0 ";
+            sinon
+                ecrire val * 8; ecrire " ";
+                ecrire val * 4; ecrire " ";
+                ecrire 255 - (val * 5); ecrire " ";
+            finsi
+
+            x = x + 1;
+        jusqua x >= width;
+
+        ecrire "\n";
+        y = y + 1;
+    jusqua y >= height;
+fin

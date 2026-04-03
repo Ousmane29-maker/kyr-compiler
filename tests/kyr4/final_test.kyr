@@ -1,0 +1,112 @@
+variables
+    entier x
+    entier y
+    entier resultat
+    booleen test
+
+fonctions
+    entier addition(entier a entier b)
+    debut
+        retourne a + b;
+    fin
+
+    entier multiplication(entier a entier b)
+    variables
+        entier temp
+    debut
+        temp = a * b;
+        retourne temp;
+    fin
+
+    entier factorielle(entier n)
+    variables
+        entier compteur
+        entier acc
+    debut
+        compteur = 1;
+        acc = 1;
+        repeter
+            acc = acc * compteur;
+            compteur = compteur + 1;
+        jusqua compteur > n;
+        retourne acc;
+    fin
+
+    booleen estPair(entier n)
+    debut
+        retourne n % 2 == 0;
+    fin
+
+    entier max(entier a entier b)
+    debut
+        si a > b alors
+            retourne a;
+        sinon
+            retourne b;
+        finsi
+    fin
+
+debut
+    ecrire "=== Tests Kyr4 === \n";
+
+    // Test 1: Variables et affectations
+    x = 5;
+    y = 3;
+    ecrire "x = ";
+    ecrire x;
+    ecrire ", y = ";
+    ecrire y;
+    ecrire "\n";
+
+    // Test 2: Fonction simple
+    resultat = addition(x, y);
+    ecrire "addition(5, 3) = ";
+    ecrire resultat;
+    ecrire "\n";
+
+    // Test 3: Fonction avec variables locales
+    resultat = multiplication(4, 7);
+    ecrire "multiplication(4, 7) = ";
+    ecrire resultat;
+    ecrire "\n";
+
+    // Test 4: Fonction récursive (via boucle)
+    resultat = factorielle(5);
+    ecrire "factorielle(5) = ";
+    ecrire resultat;
+    ecrire "\n";
+
+    // Test 5: Fonction booléenne
+    test = estPair(4);
+    ecrire "estPair(4) = ";
+    ecrire test;
+    ecrire "\n";
+
+    test = estPair(7);
+    ecrire "estPair(7) = ";
+    ecrire test;
+    ecrire "\n";
+
+    // Test 6: Fonction avec if/else
+    resultat = max(10, 20);
+    ecrire "max(10, 20) = ";
+    ecrire resultat;
+    ecrire "\n";
+
+    // Test 7: Expressions complexes
+    resultat = addition(multiplication(2, 3), max(5, 8));
+    ecrire "addition(multiplication(2, 3), max(5, 8)) = ";
+    ecrire resultat;
+    ecrire "\n";
+
+    // Test 8: Boucle dans main
+    x = 0;
+    repeter
+        x = x + 1;
+    jusqua x == 3;
+    ecrire "Apres boucle: x = ";
+    ecrire x;
+    ecrire "\n";
+
+    ecrire "=== Fin des tests ===\n";
+fin
